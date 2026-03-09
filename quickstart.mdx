@@ -1,80 +1,428 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: 'Quickstart'
+description: 'Deploy your first AI agent in under 5 minutes'
 ---
 
-## Get started in three steps
+Get your first agent running on Superserve in minutes. This guide walks you through installation, authentication, creating a simple agent, and deploying it to production.
 
-Get your documentation site running locally and make your first customization.
+## Prerequisites
 
-### Step 1: Set up your local environment
+- A [Superserve account](https://console.superserve.ai)
+- Python 3.12+ or Node.js 18+ installed
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+## Install the CLI
 
-### Step 2: Deploy your changes
+<CodeGroup>
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+```bash cURL
+curl -fsSL https://superserve.ai/install | sh
+```
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+```bash npm
+npm install -g @superserve/cli
+```
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+```bash Homebrew
+brew install superserve-ai/tap/superserve
+```
 
-### Step 3: Go live
+</CodeGroup>
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+Verify the installation:
 
-## Next steps
+```bash
+superserve --version
+```
 
-Now that you have your docs running, explore these key features:
+## Authenticate
+
+Log in to your Superserve account:
+
+```bash
+superserve login
+```
+
+This opens your browser and displays a verification code:
+
+```
+To authenticate, visit: https://console.superserve.ai/device
+Enter code: ABCD-1234
+
+Browser opened automatically.
+
+Waiting for authentication...
+✓ Authenticated successfully!
+```
+
+<Note>
+You can also authenticate with an API key using `superserve login --api-key YOUR_KEY`. Generate API keys in the [console](https://console.superserve.ai/settings/api-keys).
+</Note>
+
+## Create Your First Agent
+
+<Steps>
+
+<Step title="Create a project directory">
+
+```bash
+mkdir my-agent
+cd my-agent
+```
+
+</Step>
+
+<Step title="Create your agent file">
+
+Create a file called `agent.py` with a simple chatbot:
+
+<CodeGroup>
+
+```python Claude Agent SDK
+"""
+Minimal chatbot built with Claude Agent SDK deployed on Superserve.
+"""
+
+import asyncio
+
+from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient, TextBlock
+
+options = ClaudeAgentOptions(
+    model="sonnet",
+    system_prompt="You are a helpful assistant.",
+    permission_mode="bypassPermissions",
+    continue_conversation=True,
+)
+
+
+async def main():
+    async with ClaudeSDKClient(options=options) as client:
+        while True:
+            try:
+                user_input = input()
+            except EOFError:
+                break
+            await client.query(prompt=user_input)
+            async for msg in client.receive_response():
+                for block in getattr(msg, "content", []):
+                    if isinstance(block, TextBlock):
+                        print(block.text)
+
+
+asyncio.run(main())
+```
+
+```python OpenAI Agents SDK
+"""
+Minimal chatbot built with OpenAI Agents SDK deployed on Superserve.
+"""
+
+from agents import Agent, Runner
+
+agent = Agent(
+    name="assistant",
+    instructions="You are a helpful assistant.",
+)
+
+while True:
+    try:
+        user_input = input()
+    except EOFError:
+        break
+    result = Runner.run_sync(agent, user_input)
+    print(result.final_output)
+```
+
+```python Pydantic AI
+"""
+Minimal chatbot built with Pydantic AI deployed on Superserve.
+"""
+
+from pydantic_ai import Agent
+
+agent = Agent("openai:gpt-4o", system_prompt="You are a helpful assistant.")
+
+while True:
+    try:
+        user_input = input()
+    except EOFError:
+        break
+    result = agent.run_sync(user_input)
+    print(result.output)
+```
+
+```typescript Mastra
+/**
+ * Minimal chatbot built with Mastra deployed on Superserve.
+ */
+
+import { Agent } from "@mastra/core/agent"
+import { createInterface } from "readline"
+
+const agent = new Agent({
+  name: "assistant",
+  instructions: "You are a helpful assistant.",
+  model: "openai/gpt-4o",
+})
+
+const rl = createInterface({ input: process.stdin })
+rl.on("line", async (line) => {
+  const result = await agent.generate(line)
+  console.log(result.text)
+})
+```
+
+</CodeGroup>
+
+</Step>
+
+<Step title="Add dependencies">
+
+For Python agents, create a `requirements.txt`:
+
+<CodeGroup>
+
+```txt Claude Agent SDK
+claude-agent-sdk
+```
+
+```txt OpenAI Agents SDK
+agents-sdk
+```
+
+```txt Pydantic AI
+pydantic-ai
+```
+
+</CodeGroup>
+
+For TypeScript/JavaScript agents, create a `package.json`:
+
+```json Mastra
+{
+  "name": "my-agent",
+  "type": "module",
+  "dependencies": {
+    "@mastra/core": "^0.1.0"
+  }
+}
+```
+
+</Step>
+
+</Steps>
+
+## Deploy Your Agent
+
+Deploy your agent with a single command:
+
+```bash
+superserve deploy agent.py --name my-agent
+```
+
+<Note>
+For TypeScript agents, use `superserve deploy agent.ts --name my-agent`
+</Note>
+
+You'll see real-time progress as your agent is packaged, uploaded, and dependencies are installed:
+
+```
+  Packaging project... ✓ (2.4 KB)
+  Uploading to Superserve... ✓
+  Installing dependencies... ✓ (12.3s)
+
+  Deployed 'my-agent' in 14.8s
+
+  Set your API keys as secrets:
+  ┌─────────────────────────────────────────────────────┐
+  │ superserve secrets set my-agent KEY=VALUE           │
+  └─────────────────────────────────────────────────────┘
+
+  ┌─────────────────────────────────────────────────────┐
+  │ superserve run my-agent "your prompt here"          │
+  └─────────────────────────────────────────────────────┘
+
+  Or try it in the Playground:
+  https://playground.superserve.ai/agents/agt_abc123/
+```
+
+<Warning>
+If you redeploy an existing agent, you'll be prompted to confirm. Use `--yes` to skip confirmation.
+</Warning>
+
+## Set Your Secrets
+
+Your agent needs API keys to call AI providers. Set them as encrypted secrets:
+
+<CodeGroup>
+
+```bash Claude/Anthropic
+superserve secrets set my-agent ANTHROPIC_API_KEY=sk-ant-...
+```
+
+```bash OpenAI
+superserve secrets set my-agent OPENAI_API_KEY=sk-...
+```
+
+```bash Multiple Keys
+superserve secrets set my-agent ANTHROPIC_API_KEY=sk-ant-... OPENAI_API_KEY=sk-...
+```
+
+</CodeGroup>
+
+You'll see confirmation:
+
+```
+✓ Set 1 secret(s) for agent 'my-agent'
+Current secrets: ANTHROPIC_API_KEY
+
+Try your agent in Playground: https://playground.superserve.ai/agents/agt_abc123/
+```
+
+<Note>
+Secrets are encrypted at rest and injected via a credential proxy. They never appear in logs or LLM context. Learn more in [Secret Management](/guides/secrets-management).
+</Note>
+
+## Run Your Agent
+
+Start an interactive session with your agent:
+
+```bash
+superserve run my-agent
+```
+
+The CLI starts a live session where you can chat with your agent:
+
+```
+You > What is the capital of France?
+
+Agent > The capital of France is Paris.
+
+Completed in 1.2s
+
+You > And what's its population?
+
+Agent > Paris has approximately 2.1 million people in the city proper.
+
+Completed in 0.8s
+
+You >
+```
+
+Type `exit` or press `Ctrl+C` to end the session.
+
+### Single-shot mode
+
+For one-off queries, pass your prompt directly:
+
+```bash
+superserve run my-agent "What is the capital of France?"
+```
+
+The agent responds and exits:
+
+```
+The capital of France is Paris.
+```
+
+Add `--single` to exit after the first response without entering interactive mode.
+
+### JSON output
+
+For programmatic use, output raw JSON events:
+
+```bash
+superserve run my-agent --json "Hello!"
+```
+
+```json
+{"type":"status","status":"running"}
+{"type":"message","content":"Hello! How can I help you today?"}
+{"type":"done"}
+```
+
+## What's Happening Under the Hood
+
+When you run your agent, Superserve:
+
+1. **Spins up an isolated microVM** - Your agent runs in a dedicated Firecracker sandbox, completely isolated from other agents
+2. **Mounts persistent storage** - The `/workspace` directory persists across sessions so your agent can save and resume state
+3. **Injects secrets via proxy** - API keys are injected at the network level and never appear in your agent's environment or logs
+4. **Streams responses** - Output streams in real-time via Server-Sent Events
+
+All of this happens automatically with zero configuration.
+
+## Next Steps
 
 <CardGroup cols={2}>
 
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
+<Card title="Deploy a Complex Agent" icon="rocket" href="/cli/deploy">
+Learn how to deploy agents with custom dependencies, file uploads, and advanced configuration
 </Card>
 
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
+<Card title="Manage Secrets" icon="key" href="/guides/secrets-management">
+Set required secrets, rotate keys, and manage environment variables
 </Card>
 
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
+<Card title="Use the SDK" icon="code" href="/sdk/overview">
+Integrate Superserve into your applications with the TypeScript SDK
 </Card>
 
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
+<Card title="CLI Reference" icon="terminal" href="/cli/installation">
+Explore all available commands and options
 </Card>
 
 </CardGroup>
 
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>
+## Common Issues
+
+### Dependencies failing to install
+
+If your deployment succeeds but dependencies fail to build, check the logs:
+
+```bash
+superserve agents get my-agent
+```
+
+Look for the `deps_status` field. If it's `failed`, fix your `requirements.txt` or `package.json` and redeploy.
+
+### Missing secrets
+
+If you try to run an agent without setting required secrets:
+
+```
+✗ Missing required secret(s): ANTHROPIC_API_KEY
+Set them with:
+┌─────────────────────────────────────────────────────┐
+│ superserve secrets set my-agent ANTHROPIC_API_KEY=... │
+└─────────────────────────────────────────────────────┘
+```
+
+Set the secrets as shown in the error message.
+
+### Agent not responding
+
+If your agent starts but doesn't respond:
+
+1. Check your agent reads from `stdin` and writes to `stdout`
+2. Verify your agent code doesn't buffer output (use `flush=True` in Python or disable buffering)
+3. Test locally first: `python agent.py` or `node agent.js`
+
+## Try the Examples
+
+Explore fully-working examples in the [Superserve repository](https://github.com/superserve-ai/superserve/tree/main/examples):
+
+- **Claude Agent SDK** - Conversational agents with tool use
+- **OpenAI Agents SDK** - Multi-turn agents with function calling
+- **Pydantic AI** - Type-safe agents with structured outputs
+- **Mastra** - TypeScript agents with workflow orchestration
+- **LangChain** - Agents with memory and custom tools
+
+Clone the repo and deploy any example:
+
+```bash
+git clone https://github.com/superserve-ai/superserve.git
+cd superserve/examples/claude-agent-sdk/chatbot
+superserve deploy agent.py --name chatbot
+superserve secrets set chatbot ANTHROPIC_API_KEY=sk-ant-...
+superserve run chatbot
+```
