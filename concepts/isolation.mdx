@@ -84,7 +84,6 @@ When the session ends, the VM is destroyed. The next session gets a completely f
     All outbound HTTP requests route through Superserve's managed proxy, which:
     - Injects API keys from secrets (see [Credentials](/concepts/credentials))
     - Logs every request for the audit trail
-    - Enforces network policies (coming soon)
 
     ```python
     # This works - every session has its own network stack

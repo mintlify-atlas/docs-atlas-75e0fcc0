@@ -245,7 +245,7 @@ await session1.run("Create a file called data.txt")
 await session2.run("Create a file called data.txt")
 ```
 
-Sessions don't share state unless you explicitly use a shared filesystem (coming soon).
+Each session has its own isolated `/workspace` directory. Sessions don't share state.
 
 ## Managing workspace size
 
