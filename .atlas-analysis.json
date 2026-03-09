@@ -1,0 +1,123 @@
+{
+  "projectType": "saas",
+  "projectName": "Superserve",
+  "projectDescription": "Production infrastructure for AI agents with isolation, persistence, and governance",
+  "theme": "aspen",
+  "primaryColor": "#256262",
+  "lightColor": "#748c84",
+  "darkColor": "#e9ebe2",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/isolation",
+              "concepts/persistence",
+              "concepts/credentials",
+              "concepts/sessions"
+            ]
+          },
+          {
+            "group": "CLI Reference",
+            "pages": [
+              "cli/installation",
+              "cli/authentication",
+              "cli/deploy",
+              "cli/run",
+              "cli/agents",
+              "cli/secrets",
+              "cli/sessions"
+            ]
+          },
+          {
+            "group": "Frameworks",
+            "pages": [
+              "frameworks/overview",
+              "frameworks/claude-agent-sdk",
+              "frameworks/openai-agents-sdk",
+              "frameworks/langchain",
+              "frameworks/mastra",
+              "frameworks/pydantic-ai"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/configuration",
+              "guides/secrets-management",
+              "guides/session-management",
+              "guides/monitoring",
+              "guides/troubleshooting"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "SDK Reference",
+        "groups": [
+          {
+            "group": "TypeScript SDK",
+            "pages": [
+              "sdk/overview",
+              "sdk/installation",
+              "sdk/client",
+              "sdk/sessions",
+              "sdk/streaming",
+              "sdk/react-hooks"
+            ]
+          },
+          {
+            "group": "API Reference",
+            "pages": [
+              "api/authentication",
+              "api/agents",
+              "api/sessions",
+              "api/runs",
+              "api/secrets"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Firecracker microVM isolation for every agent session",
+    "Persistent /workspace filesystem across turns and restarts",
+    "Credential proxy that hides API keys from agent context",
+    "Real-time streaming with SSE events",
+    "Sub-second cold starts with pre-provisioned containers",
+    "One-command deployment with no configuration",
+    "Support for multiple agent frameworks",
+    "Encrypted secrets management"
+  ],
+  "publicApiSurface": [
+    "superserve login",
+    "superserve deploy",
+    "superserve run",
+    "superserve init",
+    "superserve agents list",
+    "superserve agents get",
+    "superserve agents delete",
+    "superserve secrets set",
+    "superserve secrets list",
+    "superserve sessions list",
+    "superserve sessions end",
+    "Superserve(options)",
+    "client.run(agentId, options)",
+    "client.stream(agentId, options)",
+    "client.createSession(agentId, options)",
+    "Session.send(message)",
+    "AgentStream.on(event, handler)",
+    "useAgent(agentId, apiKey)"
+  ]
+}
